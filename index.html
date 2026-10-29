@@ -1,0 +1,2776 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prento3D - Gestor Integral de Negocio 3D</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9', // Cian
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            accent: '#10b981', // Verde neón
+                            red: '#ef4444'     // Rojo acento
+                        },
+                        darkBg: '#0b0f17',
+                        darkCard: '#151d2a'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f17;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #151d2a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 3px;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-modal-content, #printable-modal-content * {
+                visibility: visible;
+            }
+            #printable-modal-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- CABECERA Y NAVEGACIÓN -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-lg no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logotipo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div id="brand-logo-container" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-brand-accent flex items-center justify-center text-white overflow-hidden shadow-md">
+                        <i data-lucide="box" class="w-6 h-6 animate-pulse" id="default-logo-icon"></i>
+                        <img id="nav-logo-preview" class="hidden w-full h-full object-cover" src="" alt="Logo">
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-brand-500 to-brand-accent bg-clip-text text-transparent id-business-name">Prento3D</span>
+                        <span class="block text-[10px] text-slate-400 tracking-widest uppercase">Gestor de Negocio 3D</span>
+                    </div>
+                </div>
+
+                <!-- Menú Escritorio -->
+                <nav class="hidden lg:flex items-center space-x-1">
+                    <button type="button" onclick="switchTab('dashboard')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 bg-brand-500 text-white" id="tab-dashboard">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 pointer-events-none"></i> Resumen
+                    </button>
+                    <button type="button" onclick="switchTab('calculadora')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-calculadora">
+                        <i data-lucide="calculator" class="w-4 h-4 text-brand-red pointer-events-none"></i> Calculadora
+                    </button>
+                    <button type="button" onclick="switchTab('presupuestos')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-presupuestos">
+                        <i data-lucide="file-text" class="w-4 h-4 text-amber-400 pointer-events-none"></i> Presupuestos
+                    </button>
+                    <button type="button" onclick="switchTab('pedidos')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-pedidos">
+                        <i data-lucide="shopping-cart" class="w-4 h-4 text-emerald-400 pointer-events-none"></i> Ventas
+                    </button>
+                    <button type="button" onclick="switchTab('catalogo')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-catalogo">
+                        <i data-lucide="folder-tree" class="w-4 h-4 text-brand-500 pointer-events-none"></i> Productos
+                    </button>
+                    <button type="button" onclick="switchTab('clientes')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-clientes">
+                        <i data-lucide="users" class="w-4 h-4 text-indigo-400 pointer-events-none"></i> Clientes
+                    </button>
+                    <button type="button" onclick="switchTab('produccion')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-produccion">
+                        <i data-lucide="clipboard-list" class="w-4 h-4 text-brand-accent pointer-events-none"></i> Taller
+                    </button>
+                    <button type="button" onclick="switchTab('maquinas')" class="tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5" id="tab-maquinas">
+                        <i data-lucide="cpu" class="w-4 h-4 pointer-events-none"></i> Equipos & Stock
+                    </button>
+                    <button type="button" onclick="switchTab('config')" class="tab-btn p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all" id="tab-config" title="Ajustes">
+                        <i data-lucide="settings" class="w-4 h-4 pointer-events-none"></i>
+                    </button>
+                </nav>
+
+                <!-- Gatillo Menú Móvil -->
+                <div class="flex items-center lg:hidden">
+                    <button type="button" onclick="toggleMobileMenu()" class="text-slate-300 hover:text-white p-2 rounded-lg focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6 pointer-events-none"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-slate-900 border-t border-slate-800 px-4 py-3 space-y-1">
+            <button type="button" onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-slate-200">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 pointer-events-none"></i> Resumen
+            </button>
+            <button type="button" onclick="switchTab('calculadora'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-brand-red">
+                <i data-lucide="calculator" class="w-4 h-4 pointer-events-none"></i> Calculadora
+            </button>
+            <button type="button" onclick="switchTab('presupuestos'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-amber-400">
+                <i data-lucide="file-text" class="w-4 h-4 pointer-events-none"></i> Presupuestos
+            </button>
+            <button type="button" onclick="switchTab('pedidos'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-emerald-400">
+                <i data-lucide="shopping-cart" class="w-4 h-4 pointer-events-none"></i> Ventas & Pedidos
+            </button>
+            <button type="button" onclick="switchTab('catalogo'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-brand-500">
+                <i data-lucide="folder-tree" class="w-4 h-4 pointer-events-none"></i> Productos & Carpetas
+            </button>
+            <button type="button" onclick="switchTab('clientes'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-indigo-400">
+                <i data-lucide="users" class="w-4 h-4 pointer-events-none"></i> Clientes
+            </button>
+            <button type="button" onclick="switchTab('produccion'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-brand-accent">
+                <i data-lucide="clipboard-list" class="w-4 h-4 pointer-events-none"></i> Control de Taller
+            </button>
+            <button type="button" onclick="switchTab('maquinas'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-slate-200">
+                <i data-lucide="cpu" class="w-4 h-4 pointer-events-none"></i> Máquinas & Stock
+            </button>
+            <button type="button" onclick="switchTab('config'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 text-slate-400">
+                <i data-lucide="settings" class="w-4 h-4 pointer-events-none"></i> Ajustes de Negocio
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 no-print">
+
+        <!-- ================= TAB: DASHBOARD ================= -->
+        <section id="panel-dashboard" class="space-y-6 tab-panel">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">Panel Principal 🚀</h1>
+                    <p class="text-slate-400 text-xs mt-1">Gestión general del taller <span class="text-brand-500 font-semibold id-business-name">Prento3D</span>.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="switchTab('calculadora')" class="px-3.5 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 transition">
+                        <i data-lucide="calculator" class="w-4 h-4 pointer-events-none"></i> Calculadora 3D
+                    </button>
+                    <button type="button" onclick="openPresupuestoModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 transition">
+                        <i data-lucide="file-plus" class="w-4 h-4 pointer-events-none"></i> Nuevo Presupuesto
+                    </button>
+                    <button type="button" onclick="switchTab('pedidos'); openNewOrderModal()" class="px-3.5 py-2 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-1.5 transition">
+                        <i data-lucide="plus-circle" class="w-4 h-4 pointer-events-none"></i> Nueva Venta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grilla KPI -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+                    <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">Ingresos Confirmados</span>
+                    <h3 class="text-2xl font-black mt-2 text-brand-accent" id="kpi-ingresos">$0.00</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">Ventas totales en sistema</p>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+                    <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">Presupuestos Emitidos</span>
+                    <h3 class="text-2xl font-black mt-2 text-amber-400" id="kpi-presupuestos">0</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">Cotizaciones a clientes</p>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+                    <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">Impresoras Activas</span>
+                    <h3 class="text-2xl font-black mt-2 text-brand-500" id="kpi-impresoras">0 / 0</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">Equipos en producción</p>
+                </div>
+
+                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group">
+                    <span class="text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">Stock Filamentos</span>
+                    <h3 class="text-2xl font-black mt-2 text-emerald-400" id="kpi-filamento">0 kg</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">Bobinas disponibles</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Listas -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 lg:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-base flex items-center gap-2">
+                            <i data-lucide="shopping-bag" class="text-brand-500 w-4 h-4 pointer-events-none"></i> Ventas Recientes
+                        </h3>
+                        <button type="button" onclick="switchTab('pedidos')" class="text-brand-500 text-xs hover:underline">Ver todas</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-500 border-b border-slate-800 text-[10px] font-extrabold uppercase">
+                                    <th class="py-2.5 px-2">Cliente</th>
+                                    <th class="py-2.5 px-2">Detalle</th>
+                                    <th class="py-2.5 px-2">Estado</th>
+                                    <th class="py-2.5 px-2 text-right">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-orders" class="divide-y divide-slate-800/60">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-base flex items-center gap-2">
+                            <i data-lucide="cpu" class="text-emerald-400 w-4 h-4 pointer-events-none"></i> Estado de Equipos
+                        </h3>
+                        <button type="button" onclick="switchTab('maquinas')" class="text-brand-500 text-xs hover:underline">Gestionar</button>
+                    </div>
+                    <div class="space-y-2.5" id="dashboard-machines-list">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: CALCULADORA DE COSTOS 3D ================= -->
+        <section id="panel-calculadora" class="space-y-6 tab-panel hidden">
+            <div>
+                <h2 class="text-2xl font-black flex items-center gap-2 text-slate-100">
+                    <i data-lucide="calculator" class="text-red-500 w-6 h-6 pointer-events-none"></i> Calculadora de Costos 3D
+                </h2>
+                <p class="text-slate-400 text-xs mt-1">Configuración totalmente editable de gastos fijos, consumo, piezas y márgenes de ganancia estilo Erexit 3D.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Columna Izquierda: Parámetros y Gastos -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- Card 1: Gastos fijos -->
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 space-y-4">
+                        <h3 class="font-bold text-sm text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="sliders" class="text-brand-500 w-4 h-4 pointer-events-none"></i> Gastos fijos
+                        </h3>
+
+                        <div class="space-y-3.5">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Precio del filamento (AR$/kg)</label>
+                                <input type="number" id="calc-fil-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="22000" oninput="runCalculator()">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Precio del kWh (AR$)</label>
+                                <input type="number" id="calc-kwh-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="1240" oninput="runCalculator()">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo de impresora</label>
+                                <p class="text-[10px] text-slate-500 italic mb-1.5">Elegí tu modelo y autocompletamos el consumo (W). Si no está en la lista, dejá "Otro / Personalizado".</p>
+                                <select id="calc-printer-preset" onchange="applyPrinterPreset()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:border-red-500 focus:outline-none">
+                                    <option value="95" selected>Bambu Lab A1 (95 W)</option>
+                                    <option value="60">Bambu Lab A1 Mini (60 W)</option>
+                                    <option value="110">Bambu Lab X1-Carbon / P1P / P1S (110 W)</option>
+                                    <option value="100">Creality Ender 3 / V2 / Neo (100 W)</option>
+                                    <option value="150">Creality K1 / K1 Max (150 W)</option>
+                                    <option value="120">Neptune 4 / Pro (120 W)</option>
+                                    <option value="custom">Otro / Personalizado</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Consumo de la impresora (W)</label>
+                                <p class="text-[10px] text-slate-500 italic mb-1">Auto-completado por el modelo de impresora. Elegí "Otro / Personalizado" para editar.</p>
+                                <input type="number" id="calc-printer-watts" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="95" oninput="runCalculator()">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Vida útil de la máquina (horas)</label>
+                                <input type="number" id="calc-machine-lifespan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:border-red-500 focus:outline-none" value="4320" oninput="runCalculator()">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Costo de repuestos (AR$)</label>
+                                <input type="number" id="calc-parts-cost" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:border-red-500 focus:outline-none" value="150000" oninput="runCalculator()">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Margen de error (%)</label>
+                                <input type="number" id="calc-error-margin" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:border-red-500 focus:outline-none" value="15" oninput="runCalculator()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Pieza -->
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 space-y-4">
+                        <h3 class="font-bold text-sm text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="box" class="text-amber-400 w-4 h-4 pointer-events-none"></i> Pieza
+                        </h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre / Identificador de la Pieza</label>
+                                <input type="text" id="calc-piece-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:border-red-500 focus:outline-none" placeholder="Ej: Soporte de Celular / Llavero">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Horas de impresión</label>
+                                <input type="number" id="calc-piece-hours" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="1" oninput="runCalculator()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Minutos adicionales</label>
+                                <input type="number" id="calc-piece-minutes" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="8" oninput="runCalculator()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Gramos de filamento</label>
+                                <input type="number" id="calc-piece-grams" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="31" oninput="runCalculator()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 mb-1">Insumos extra (AR$)</label>
+                                <input type="number" id="calc-piece-extras" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:border-red-500 focus:outline-none" value="1500" placeholder="Tornillos, resortes, etc." oninput="runCalculator()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Margen de Ganancia -->
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 space-y-4">
+                        <h3 class="font-bold text-sm text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="trending-up" class="text-emerald-400 w-4 h-4 pointer-events-none"></i> Margen de ganancia
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-2">Multiplicador</label>
+                            <div class="grid grid-cols-3 gap-2 mb-3">
+                                <button type="button" onclick="setMultiplier(2)" class="btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700" data-val="2">×2</button>
+                                <button type="button" onclick="setMultiplier(2.5)" class="btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700" data-val="2.5">×2.5</button>
+                                <button type="button" onclick="setMultiplier(3)" class="btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700" data-val="3">×3</button>
+                                <button type="button" onclick="setMultiplier(3.5)" class="btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700" data-val="3.5">×3.5</button>
+                                <button type="button" onclick="setMultiplier(4)" class="btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700" data-val="4">×4</button>
+                                <button type="button" onclick="setMultiplier(5)" class="btn-mult py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md" data-val="5">×5</button>
+                            </div>
+
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Personalizado</label>
+                            <p class="text-[10px] text-slate-500 italic mb-1">Si necesitás otro valor, ingresalo acá (ej: 2.8).</p>
+                            <input type="number" id="calc-custom-mult" step="0.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-100 focus:border-red-500 focus:outline-none" value="5" oninput="setCustomMultiplier(this.value)">
+                        </div>
+
+                        <details class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3 text-xs">
+                            <summary class="font-bold text-red-500 cursor-pointer hover:underline flex items-center gap-1.5">
+                                Referencias
+                            </summary>
+                            <ul class="mt-2 space-y-1 text-slate-400 text-[11px] list-disc list-inside">
+                                <li><strong>×2.0</strong> → Alto volumen / descuento</li>
+                                <li><strong>×2.5</strong> → Volumen medio</li>
+                                <li><strong>×3.0</strong> → Mayorista</li>
+                                <li><strong>×3.5</strong> → Intermedio</li>
+                                <li><strong>×4.0</strong> → Minorista</li>
+                                <li><strong>×5.0</strong> → Llaveros / piezas chicas</li>
+                            </ul>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Resultados en Vivo (5 cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-slate-900 rounded-2xl border border-red-900/40 p-5 space-y-5 sticky top-20 shadow-xl">
+                        <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                            <i data-lucide="calculator" class="text-red-500 w-5 h-5 pointer-events-none"></i> Resultados
+                        </h3>
+
+                        <div class="space-y-2.5 text-xs text-slate-300 border-b border-slate-800 pb-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Precio material:</span>
+                                <span class="font-bold text-slate-200" id="res-material">AR$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Precio luz:</span>
+                                <span class="font-bold text-slate-200" id="res-luz">AR$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Desgaste máquina:</span>
+                                <span class="font-bold text-slate-200" id="res-desgaste">AR$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Margen de error:</span>
+                                <span class="font-bold text-slate-200" id="res-error">AR$ 0,00</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs text-slate-300 border-b border-slate-800 pb-4">
+                            <div class="flex justify-between items-center font-semibold">
+                                <span class="text-slate-200">Costo total (sin insumos):</span>
+                                <span class="font-bold text-slate-100" id="res-costo-base">AR$ 0,00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-400">Insumos (+30%):</span>
+                                <span class="font-bold text-slate-200" id="res-insumos">AR$ 0,00</span>
+                            </div>
+                        </div>
+
+                        <!-- TOTAL A COBRAR -->
+                        <div class="bg-red-950/40 border border-red-600/30 rounded-2xl p-4 text-center">
+                            <span class="block text-[10px] font-black uppercase text-red-500 tracking-wider mb-1">TOTAL A COBRAR</span>
+                            <span class="text-3xl font-black text-slate-100" id="res-total-cobrar">AR$ 0,00</span>
+                        </div>
+
+                        <!-- PRECIO MERCADOLIBRE -->
+                        <div class="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-4 text-center">
+                            <span class="block text-[10px] font-black uppercase text-amber-400 tracking-wider mb-1">PRECIO MERCADOLIBRE</span>
+                            <span class="text-2xl font-black text-amber-300" id="res-precio-ml">AR$ 0,00</span>
+                        </div>
+
+                        <button type="button" onclick="saveCalcToProduct()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-md">
+                            <i data-lucide="box" class="w-4 h-4 text-brand-500 pointer-events-none"></i> Guardar como producto
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: PRESUPUESTOS ================= -->
+        <section id="panel-presupuestos" class="space-y-6 tab-panel hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black flex items-center gap-2">
+                        <i data-lucide="file-text" class="text-amber-400 w-6 h-6 pointer-events-none"></i> Presupuestos & Cotizaciones
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Arma cotizaciones formales para tus clientes y conviértelas en ventas registradas.</p>
+                </div>
+                <button type="button" onclick="openPresupuestoModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4 pointer-events-none"></i> Crear Presupuesto
+                </button>
+            </div>
+
+            <!-- Filtros y Ordenamiento -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-3 items-center">
+                <div class="flex-1 min-w-[200px]">
+                    <input type="text" id="presupuesto-search" oninput="renderPresupuestos()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-400 text-slate-100" placeholder="Buscar presupuesto por cliente o número...">
+                </div>
+                <div>
+                    <select id="presupuesto-filter-status" onchange="renderPresupuestos()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100">
+                        <option value="all">Estado: Todos</option>
+                        <option value="Borrador">Borrador</option>
+                        <option value="Enviado">Enviado</option>
+                        <option value="Aprobado">Aprobado</option>
+                        <option value="Rechazado">Rechazado</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="presupuesto-sort" onchange="renderPresupuestos()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100">
+                        <option value="date-desc">Más Recientes</option>
+                        <option value="date-asc">Más Antiguos</option>
+                        <option value="total-desc">Mayor Monto</option>
+                        <option value="total-asc">Menor Monto</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Listado de Presupuestos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="presupuestos-grid">
+            </div>
+        </section>
+
+        <!-- ================= TAB: PEDIDOS & VENTAS ================= -->
+        <section id="panel-pedidos" class="space-y-6 tab-panel hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black flex items-center gap-2">
+                        <i data-lucide="shopping-cart" class="text-emerald-400 w-6 h-6 pointer-events-none"></i> Ventas & Registro de Pedidos
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Control de ventas, señas cobradas, pagos pendientes y emisión de comprobantes.</p>
+                </div>
+                <button type="button" onclick="openNewOrderModal()" class="px-4 py-2.5 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4 pointer-events-none"></i> Registrar Venta
+                </button>
+            </div>
+
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-3 items-center">
+                <div class="flex-1 min-w-[200px]">
+                    <input type="text" id="order-search" oninput="renderOrders()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100" placeholder="Buscar venta por cliente o producto...">
+                </div>
+                <div>
+                    <select id="filter-order-status" onchange="renderOrders()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100">
+                        <option value="all">Estado Venta: Todos</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Imprimiendo">Imprimiendo</option>
+                        <option value="Terminado">Terminado</option>
+                        <option value="Entregado">Entregado</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="filter-payment-status" onchange="renderOrders()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100">
+                        <option value="all">Pago: Todos</option>
+                        <option value="Impago">Impago</option>
+                        <option value="Seña">Seña</option>
+                        <option value="Pagado">Pagado</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="order-sort" onchange="renderOrders()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100">
+                        <option value="date-desc">Más Recientes</option>
+                        <option value="date-asc">Más Antiguos</option>
+                        <option value="total-desc">Mayor Monto</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-4" id="orders-list">
+            </div>
+        </section>
+
+        <!-- ================= TAB: CATALOGO DE PRODUCTOS Y CARPETAS ================= -->
+        <section id="panel-catalogo" class="space-y-6 tab-panel hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black flex items-center gap-2">
+                        <i data-lucide="folder-tree" class="text-brand-500 w-6 h-6 pointer-events-none"></i> Catálogo de Productos
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Organiza tus modelos 3D por carpetas y ordena alfabéticamente o por fecha de modificación.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="openFolderModal()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-brand-500 border border-brand-500/30 rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i data-lucide="folder-plus" class="w-4 h-4 pointer-events-none"></i> Nueva Carpeta
+                    </button>
+                    <button type="button" onclick="openProductModal()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i> Nuevo Producto
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra de Carpetas, Filtro y Ordenamiento -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                <!-- Select de Carpeta / Categoría -->
+                <div class="flex flex-wrap items-center gap-2" id="folder-pills-container">
+                </div>
+
+                <div class="flex flex-wrap gap-3 items-center border-t border-slate-800/80 pt-3">
+                    <div class="flex-1 min-w-[200px]">
+                        <input type="text" id="product-search" oninput="renderProducts()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-500 text-slate-100" placeholder="Buscar producto por nombre...">
+                    </div>
+                    <div>
+                        <select id="product-sort" onchange="renderProducts()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-100">
+                            <option value="name-asc">Nombre (A - Z)</option>
+                            <option value="name-desc">Nombre (Z - A)</option>
+                            <option value="price-desc">Precio (Mayor a Menor)</option>
+                            <option value="price-asc">Precio (Menor a Mayor)</option>
+                            <option value="updated-desc">Última Modificación (Recientes)</option>
+                            <option value="updated-asc">Última Modificación (Antiguos)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="products-grid">
+            </div>
+        </section>
+
+        <!-- ================= TAB: CLIENTES ================= -->
+        <section id="panel-clientes" class="space-y-6 tab-panel hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black flex items-center gap-2">
+                        <i data-lucide="users" class="text-indigo-400 w-6 h-6 pointer-events-none"></i> Directorio de Clientes
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Administra tus contactos y ordénalos alfabéticamente o por fecha de registro.</p>
+                </div>
+                <button type="button" onclick="openClientModal()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition">
+                    <i data-lucide="user-plus" class="w-4 h-4 pointer-events-none"></i> Nuevo Cliente
+                </button>
+            </div>
+
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
+                <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div class="relative max-w-xs w-full">
+                        <input type="text" id="client-search" oninput="renderClients()" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-brand-500 text-slate-100" placeholder="Buscar por nombre o celular...">
+                        <div class="absolute inset-y-0 left-3 flex items-center text-slate-500 pointer-events-none">
+                            <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400 font-bold">Ordenar por:</span>
+                        <select id="client-sort" onchange="renderClients()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none">
+                            <option value="name-asc">Nombre (A - Z)</option>
+                            <option value="name-desc">Nombre (Z - A)</option>
+                            <option value="date-desc">Fecha de Registro (Recientes)</option>
+                            <option value="date-asc">Fecha de Registro (Antiguos)</option>
+                            <option value="orders-desc">Mayor Cantidad de Compras</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-950">
+                            <tr class="text-slate-400 border-b border-slate-800 text-[10px] font-extrabold uppercase">
+                                <th class="py-3 px-5">Cliente</th>
+                                <th class="py-3 px-5">Celular / WhatsApp</th>
+                                <th class="py-3 px-5">Notas de Contacto</th>
+                                <th class="py-3 px-5 text-center">Compras</th>
+                                <th class="py-3 px-5 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-table-body" class="divide-y divide-slate-800/60">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: CONTROL INTERNO / TALLER ================= -->
+        <section id="panel-produccion" class="space-y-6 tab-panel hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black flex items-center gap-2">
+                        <i data-lucide="clipboard-list" class="text-brand-accent w-6 h-6 pointer-events-none"></i> Control de Taller & Fichas Técnicas
+                    </h2>
+                    <p class="text-slate-400 text-xs mt-1">Guarda los detalles técnicos privados, insumos extras y configuraciones de impresión.</p>
+                </div>
+                <button type="button" onclick="openProductionSheetModal()" class="px-4 py-2.5 bg-brand-accent hover:bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4 pointer-events-none"></i> Crear Ficha Técnica
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="production-sheets-grid">
+            </div>
+        </section>
+
+        <!-- ================= TAB: MAQUINAS & STOCK ================= -->
+        <section id="panel-maquinas" class="space-y-8 tab-panel hidden">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-black">Impresoras 3D</h2>
+                        <p class="text-slate-400 text-xs">Equipos de impresión y disponibilidad</p>
+                    </div>
+                    <button type="button" onclick="openMachineModal()" class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                        <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i> Añadir Máquina
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="machines-grid">
+                </div>
+            </div>
+
+            <hr class="border-slate-800">
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-black">Inventario de Filamentos</h2>
+                        <p class="text-slate-400 text-xs">Monitoreo de gramos restantes por bobina</p>
+                    </div>
+                    <button type="button" onclick="openFilamentModal()" class="px-3.5 py-2 bg-brand-accent hover:bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition">
+                        <i data-lucide="plus" class="w-4 h-4 pointer-events-none"></i> Añadir Filamento
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="filaments-grid">
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: CONFIGURACIÓN ================= -->
+        <section id="panel-config" class="space-y-6 tab-panel hidden">
+            <div>
+                <h2 class="text-2xl font-black">Configuración General</h2>
+                <p class="text-slate-400 text-xs mt-1">Datos de tu taller para incluir en comprobantes y cotizaciones.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 lg:col-span-2 space-y-4">
+                    <h3 class="font-bold text-sm text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Datos de Marca</h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Comercial</label>
+                            <input type="text" id="cfg-biz-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Teléfono / WhatsApp</label>
+                            <input type="text" id="cfg-biz-phone" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Dirección / Localidad</label>
+                            <input type="text" id="cfg-biz-address" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Símbolo Monetario</label>
+                            <input type="text" id="cfg-biz-currency" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100" value="AR$">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-400 mb-1">Leyenda al pie de Recibos y Presupuestos</label>
+                            <input type="text" id="cfg-biz-footer" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100">
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-4">
+                        <label class="block text-xs font-semibold text-slate-400 mb-2">Logo de Marca (Se aplicará a tus Recibos y Comprobantes)</label>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
+                                <img id="logo-preview-element" class="hidden w-full h-full object-contain p-1" src="" alt="Preview">
+                                <i data-lucide="image" class="w-6 h-6 text-slate-600 pointer-events-none" id="logo-placeholder-icon"></i>
+                            </div>
+                            <div>
+                                <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                                <label for="logo-upload" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold cursor-pointer inline-flex items-center gap-2 text-slate-200 border border-slate-700">
+                                    <i data-lucide="upload" class="w-3.5 h-3.5 text-brand-500 pointer-events-none"></i> Cargar Logo
+                                </label>
+                                <p class="text-[10px] text-slate-500 mt-1">Formatos admitidos: PNG, JPG o SVG.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button type="button" onclick="saveBusinessConfig()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md">
+                            Guardar Ajustes
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-200 uppercase tracking-wider border-b border-slate-800 pb-2">Copia de Seguridad</h3>
+                        <p class="text-xs text-slate-400 mt-2">Guarda una copia de respaldo en tu dispositivo o restaura una existente.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button type="button" onclick="exportData()" class="w-full py-2.5 bg-brand-accent hover:bg-emerald-600 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-2 shadow-md">
+                            <i data-lucide="download" class="w-4 h-4 pointer-events-none"></i> Exportar JSON
+                        </button>
+
+                        <div>
+                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+                            <button type="button" onclick="triggerImportClick()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-300 flex items-center justify-center gap-2 border border-slate-700">
+                                <i data-lucide="upload" class="w-4 h-4 pointer-events-none"></i> Importar JSON
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[10px] text-slate-500 text-center">Tus datos se guardan de forma local en el navegador.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-900 py-4 text-center text-xs text-slate-600 no-print">
+        <p>&copy; 2026 <span class="id-business-name">Prento3D</span> - Gestor de Taller & Cotizador 3D.</p>
+    </footer>
+
+    <!-- ================= MODALES ================= -->
+
+    <!-- Modal Confirmación -->
+    <div id="modal-confirm" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-6 space-y-4 shadow-2xl text-center">
+            <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto">
+                <i data-lucide="alert-triangle" class="w-6 h-6 pointer-events-none"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-100" id="confirm-title">¿Confirmar Acción?</h3>
+                <p class="text-xs text-slate-400 mt-1" id="confirm-message">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" id="btn-confirm-cancel" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold transition">Cancelar</button>
+                <button type="button" id="btn-confirm-action" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Carpeta / Categoría Nueva -->
+    <div id="modal-folder" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-6 space-y-4">
+            <h3 class="text-base font-bold flex items-center gap-2 text-brand-500">
+                <i data-lucide="folder-plus" class="w-5 h-5 pointer-events-none"></i> Nueva Carpeta de Productos
+            </h3>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre de la Carpeta</label>
+                <input type="text" id="folder-name-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500" placeholder="Ej: Cosplay, Llaveros, Repuestos...">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeFolderModal()" class="px-3.5 py-2 bg-slate-800 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveFolder()" class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold">Crear Carpeta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Presupuesto -->
+    <div id="modal-presupuesto" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden overflow-y-auto">
+        <div class="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 p-6 space-y-4 max-h-[90vh] overflow-y-auto my-8">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-amber-400">
+                    <i data-lucide="file-text" class="w-5 h-5 pointer-events-none"></i> 
+                    <span id="presupuesto-modal-title">Nuevo Presupuesto</span>
+                </h3>
+                <button type="button" onclick="closePresupuestoModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cliente Solicitante</label>
+                        <select id="pres-client" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Validez de la Oferta (Días)</label>
+                        <input type="number" id="pres-validity" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" value="15">
+                    </div>
+                </div>
+
+                <div class="space-y-2 border-t border-slate-800 pt-3">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-bold text-slate-300 uppercase">Ítems Presupuestados</label>
+                        <button type="button" onclick="addPresupuestoItemRow()" class="text-xs text-amber-400 hover:underline flex items-center gap-1 font-bold">
+                            <i data-lucide="plus" class="w-3.5 h-3.5 pointer-events-none"></i> Añadir Ítem
+                        </button>
+                    </div>
+                    <div id="pres-items-container" class="space-y-2">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800 pt-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estado Presupuesto</label>
+                        <select id="pres-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                            <option value="Borrador">Borrador</option>
+                            <option value="Enviado">Enviado a Cliente</option>
+                            <option value="Aprobado">Aprobado</option>
+                            <option value="Rechazado">Rechazado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Observaciones / Condición de Pago</label>
+                        <input type="text" id="pres-notes" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" placeholder="Ej: Seña del 50% al confirmar producción.">
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Monto Total Estimado</span>
+                    <span class="text-2xl font-black text-amber-400" id="pres-total-display">AR$ 0</span>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                <button type="button" onclick="closePresupuestoModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="savePresupuesto()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black">Guardar Presupuesto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ficha Técnica -->
+    <div id="modal-production-sheet" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden overflow-y-auto">
+        <div class="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-800 p-6 space-y-4 max-h-[90vh] overflow-y-auto my-8">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="text-brand-accent w-5 h-5 pointer-events-none"></i> 
+                    <span id="prod-sheet-modal-title">Ficha Técnica de Control</span>
+                </h3>
+                <button type="button" onclick="closeProductionSheetModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Proyecto</label>
+                        <input type="text" id="sh-title" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" placeholder="Ej: Máscara / Casco Personalizado">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cliente Solicitante</label>
+                        <select id="sh-client" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800 pt-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Tiempo de Impresión</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="sh-hours" min="0" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center font-bold"> Horas
+                            <input type="number" id="sh-minutes" min="0" max="59" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-center font-bold"> Min
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Notas Técnicas Privadas</label>
+                        <textarea id="sh-notes" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" placeholder="Secretos técnicos, temperaturas, soportes..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                <button type="button" onclick="closeProductionSheetModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveProductionSheet()" class="px-4 py-2 bg-brand-accent hover:bg-emerald-600 text-white rounded-xl text-xs font-bold">Guardar Ficha</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Impresora -->
+    <div id="modal-machine" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 p-6 space-y-4">
+            <h3 class="text-base font-bold" id="machine-modal-title">Nueva Impresora</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre / Nombre Taller</label>
+                    <input type="text" id="m-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Modelo de Impresora</label>
+                    <input type="text" id="m-model" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Estado</label>
+                    <select id="m-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                        <option value="Libre">Libre / Disponible</option>
+                        <option value="Imprimiendo">Imprimiendo</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeMachineModal()" class="px-3.5 py-2 bg-slate-800 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveMachine()" class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Filamento -->
+    <div id="modal-filament" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 p-6 space-y-4">
+            <h3 class="text-base font-bold" id="filament-modal-title">Registrar Filamento</h3>
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Material</label>
+                        <input type="text" id="f-material" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" placeholder="PLA, PETG, ABS">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Color</label>
+                        <input type="text" id="f-color" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" placeholder="Negro, Rojo...">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Gramos Restantes</label>
+                        <input type="number" id="f-weight" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" value="1000">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Costo por Kg (AR$)</label>
+                        <input type="number" id="f-cost" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" value="22000">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Marca</label>
+                    <input type="text" id="f-brand" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" placeholder="Grilon3, Printalot...">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeFilamentModal()" class="px-3.5 py-2 bg-slate-800 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveFilament()" class="px-3.5 py-2 bg-brand-accent hover:bg-emerald-600 text-white rounded-xl text-xs font-bold">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Producto -->
+    <div id="modal-product" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 p-6 space-y-4">
+            <h3 class="text-base font-bold" id="product-modal-title">Producto del Catálogo</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre del Modelo</label>
+                    <input type="text" id="p-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Peso (g)</label>
+                        <input type="number" id="p-weight" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Horas</label>
+                        <input type="number" id="p-hours" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Precio Venta (AR$)</label>
+                        <input type="number" id="p-price" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Carpeta / Categoría</label>
+                        <select id="p-category-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeProductModal()" class="px-3.5 py-2 bg-slate-800 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveProduct()" class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cliente -->
+    <div id="modal-client" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 w-full max-w-md rounded-2xl border border-slate-800 p-6 space-y-4">
+            <h3 class="text-base font-bold" id="client-modal-title">Ficha de Cliente</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre Completo</label>
+                    <input type="text" id="c-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Celular / WhatsApp</label>
+                    <input type="text" id="c-phone" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Notas de Contacto</label>
+                    <textarea id="c-notes" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeClientModal()" class="px-3.5 py-2 bg-slate-800 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveClient()" class="px-3.5 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Venta / Pedido -->
+    <div id="modal-order" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden overflow-y-auto">
+        <div class="bg-slate-900 w-full max-w-xl rounded-2xl border border-slate-800 p-6 space-y-4 max-h-[90vh] overflow-y-auto my-8">
+            <h3 class="text-lg font-bold" id="order-modal-title">Registrar Venta</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cliente Solicitante</label>
+                    <select id="o-client" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100"></select>
+                </div>
+
+                <div class="space-y-2 border-t border-slate-800 pt-3">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-xs font-bold text-slate-300 uppercase">Productos Adquiridos</label>
+                        <button type="button" onclick="addProductRowToOrder()" class="text-xs text-brand-500 hover:underline flex items-center gap-1 font-bold">
+                            <i data-lucide="plus" class="w-3.5 h-3.5 pointer-events-none"></i> Agregar Producto
+                        </button>
+                    </div>
+                    <div id="order-products-container" class="space-y-2"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 border-t border-slate-800 pt-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estado de Impresión</label>
+                        <select id="o-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Imprimiendo">Imprimiendo</option>
+                            <option value="Terminado">Terminado</option>
+                            <option value="Entregado">Entregado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Medio de Pago</label>
+                        <select id="o-payment-method" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia Bancaria</option>
+                            <option value="Mercado Pago">Mercado Pago</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Monto Total</label>
+                        <input type="number" id="o-total" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Seña (AR$)</label>
+                        <input type="number" id="o-deposit" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100" value="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estado Pago</label>
+                        <select id="o-payment-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-slate-100">
+                            <option value="Impago">Impago</option>
+                            <option value="Seña">Seña</option>
+                            <option value="Pagado">Pagado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                <button type="button" onclick="closeOrderModal()" class="px-4 py-2 bg-slate-800 rounded-xl text-xs font-bold">Cancelar</button>
+                <button type="button" onclick="saveOrder()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold">Guardar Venta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Comprobante / Recibo / Presupuesto para Imprimir -->
+    <div id="modal-printable" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm hidden overflow-y-auto">
+        <div class="bg-white text-slate-900 w-full max-w-xl rounded-2xl shadow-2xl p-8 relative space-y-6 my-8 overflow-hidden" id="printable-modal-content">
+            
+            <!-- Marca de agua en el fondo -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5 z-0">
+                <img id="pr-watermark-img" class="w-80 h-80 object-contain hidden" src="" alt="Marca de Agua">
+                <i data-lucide="box" id="pr-watermark-icon" class="w-72 h-72 text-slate-900"></i>
+            </div>
+
+            <!-- Contenido imprimible -->
+            <div class="relative z-10 space-y-6">
+
+                <!-- OPCIONES DE IMPRESIÓN -->
+                <div class="no-print bg-slate-100 p-3 rounded-xl border border-slate-300 space-y-2 mb-2">
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block">Opciones de Impresión / Recibo:</span>
+                    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-800">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-semibold">
+                            <input type="checkbox" id="toggle-print-order-status" checked onchange="updatePrintableVisibility()" class="rounded accent-brand-500">
+                            Mostrar estado del pedido
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer font-semibold">
+                            <input type="checkbox" id="toggle-print-payment-status" checked onchange="updatePrintableVisibility()" class="rounded accent-brand-500">
+                            Mostrar estado del pago
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-start border-b pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                            <img id="pr-header-logo-img" class="w-full h-full object-contain p-1 hidden" src="" alt="Logo Recibo">
+                            <i data-lucide="box" id="pr-header-logo-icon" class="w-8 h-8 text-slate-800 pointer-events-none"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-black text-slate-900" id="pr-biz-name">Prento3D</h2>
+                            <p class="text-xs text-slate-500" id="pr-biz-phone">Tel: --</p>
+                            <p class="text-xs text-slate-500" id="pr-biz-address">Dirección</p>
+                        </div>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <span class="inline-block px-3 py-1 bg-slate-100 font-extrabold text-xs uppercase tracking-wider rounded-lg" id="pr-document-type">Documento</span>
+                        <p class="text-xs text-slate-600 font-bold" id="pr-doc-id">Nº 001</p>
+                        <p class="text-xs text-slate-500" id="pr-doc-date">Fecha: --</p>
+                        
+                        <!-- Badges de Estado -->
+                        <div id="pr-order-status-badge" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                            Estado Pedido: <span id="pr-order-status-val">Pendiente</span>
+                        </div>
+                        <div id="pr-payment-status-badge" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 ml-1">
+                            Pago: <span id="pr-payment-status-val">Pagado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs space-y-0.5">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Cliente / Destinatario</p>
+                    <p class="text-sm font-bold text-slate-900" id="pr-client-name">Cliente</p>
+                    <p class="text-slate-600" id="pr-client-phone">Contacto: --</p>
+                </div>
+
+                <div class="space-y-2">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-500 border-b border-slate-200 text-[10px] uppercase font-bold">
+                                <th class="py-2">Descripción / Ítem</th>
+                                <th class="py-2 text-center">Cant</th>
+                                <th class="py-2 text-right">Precio Unit</th>
+                                <th class="py-2 text-right">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pr-items-list" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+
+                <div class="border-t pt-4 grid grid-cols-2 gap-4 text-xs">
+                    <div class="space-y-1">
+                        <p class="text-slate-500" id="pr-extra-info">Información adicional</p>
+                    </div>
+                    <div class="space-y-1 text-right">
+                        <div class="flex justify-between font-black text-base text-slate-900 border-t pt-1">
+                            <span>TOTAL:</span>
+                            <span id="pr-total-val" class="text-brand-600">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4 border-t text-xs text-slate-400 italic">
+                    <p id="pr-footer-text">¡Gracias por su preferencia!</p>
+                </div>
+
+                <div class="no-print flex justify-end gap-3 pt-4 border-t border-slate-200">
+                    <button type="button" onclick="closePrintableModal()" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-xl text-xs font-bold">Cerrar</button>
+                    <button type="button" onclick="window.print()" class="px-4 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold flex items-center gap-1">
+                        <i data-lucide="printer" class="w-4 h-4 pointer-events-none"></i> Imprimir / Guardar PDF
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast-notification" class="fixed bottom-4 right-4 z-[99] bg-slate-900 border-l-4 border-brand-500 p-4 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-20 opacity-0 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-500">
+            <i data-lucide="check-circle" class="w-5 h-5 pointer-events-none"></i>
+        </div>
+        <div>
+            <p class="text-xs font-semibold text-slate-400">Prento3D System</p>
+            <p class="text-sm font-bold text-slate-100" id="toast-message">Operación exitosa</p>
+        </div>
+    </div>
+
+    <!-- CONTROLADOR LÓGICO DE LA APLICACIÓN -->
+    <script>
+        // BASE DE DATOS LOCAL
+        let appState = {
+            businessName: "Prento3D",
+            businessPhone: "+54 9 11 2345-6789",
+            businessAddress: "Buenos Aires, Argentina",
+            businessCurrency: "AR$",
+            businessFooter: "¡Gracias por confiar en nuestra ingeniería 3D!",
+            businessLogo: "",
+            
+            folders: ["General", "Soportes", "Llaveros", "Cosplay", "Repuestos"],
+            selectedFolder: "Todos",
+
+            machines: [
+                { id: "m1", name: "Bambu Lab A1", model: "Bambu Lab FDM", status: "Libre" },
+                { id: "m2", name: "Ender 3 Neo", model: "Creality FDM", status: "Imprimiendo" }
+            ],
+            filaments: [
+                { id: "f1", material: "PLA", color: "Negro Jet", weight: 950, cost: 22000, brand: "Grilon3" },
+                { id: "f2", material: "PLA", color: "Rojo Semimate", weight: 650, cost: 22000, brand: "Printalot" }
+            ],
+            products: [
+                { id: "p1", name: "Soporte Gamer de Mesa", weight: 120, hours: 5, price: 7800, category: "Soportes", updatedAt: "2026-06-01" },
+                { id: "p2", name: "Llavero Personalizado", weight: 15, hours: 0.5, price: 1500, category: "Llaveros", updatedAt: "2026-06-05" }
+            ],
+            clients: [
+                { id: "c1", name: "Carlos Pérez", phone: "+54 9 11 6543-2109", notes: "Cliente frecuente de llaveros corporativos", createdAt: "2026-05-10" },
+                { id: "c2", name: "Ana Gómez", phone: "+54 9 11 9876-5432", notes: "Diseños de cosplay", createdAt: "2026-06-01" }
+            ],
+            presupuestos: [
+                {
+                    id: "pres-101",
+                    clientId: "c1",
+                    date: "2026-06-20",
+                    validityDays: 15,
+                    items: [
+                        { description: "Soporte Gamer de Mesa", quantity: 5, unitPrice: 7800 }
+                    ],
+                    status: "Enviado",
+                    notes: "Cotización por lote de 5 unidades con envío bonificado.",
+                    total: 39000
+                }
+            ],
+            orders: [
+                {
+                    id: "ped-101",
+                    clientId: "c1",
+                    date: "2026-06-18",
+                    products: [
+                        { productId: "p2", quantity: 20, price: 1500 }
+                    ],
+                    status: "Terminado",
+                    paymentStatus: "Pagado",
+                    paymentMethod: "Transferencia",
+                    deposit: 30000,
+                    total: 30000
+                }
+            ],
+            productionSheets: []
+        };
+
+        let currentMultiplier = 5;
+
+        let editingProductId = null;
+        let editingClientId = null;
+        let editingOrderId = null;
+        let editingPresupuestoId = null;
+        let editingMachineId = null;
+        let editingFilamentId = null;
+        let editingSheetId = null;
+        let confirmActionCallback = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedState = localStorage.getItem('prento3d_state_v6');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    appState = { ...appState, ...parsed };
+                } catch (e) {
+                    console.error("Error al restaurar base de datos.");
+                }
+            }
+
+            const btnCancel = document.getElementById('btn-confirm-cancel');
+            const btnAction = document.getElementById('btn-confirm-action');
+            if(btnCancel) btnCancel.addEventListener('click', closeConfirmModal);
+            if(btnAction) btnAction.addEventListener('click', triggerConfirmAction);
+
+            applyBusinessTheme();
+            renderAll();
+            runCalculator();
+        });
+
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('prento3d_state_v6', JSON.stringify(appState));
+            } catch (e) {
+                console.error("Error guardando en localStorage:", e);
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast-notification');
+            const toastMsg = document.getElementById('toast-message');
+            if (!toast || !toastMsg) return;
+            
+            toastMsg.innerText = message;
+            if (isError) {
+                toast.classList.remove('border-brand-500');
+                toast.classList.add('border-red-500');
+            } else {
+                toast.classList.remove('border-red-500');
+                toast.classList.add('border-brand-500');
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function refreshIcons() {
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+            const targetPanel = document.getElementById(`panel-${tabId}`);
+            if (targetPanel) targetPanel.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-3 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800 transition-all flex items-center gap-1.5";
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 bg-brand-500 text-white";
+            }
+            refreshIcons();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function applyBusinessTheme() {
+            document.querySelectorAll('.id-business-name').forEach(el => el.innerText = appState.businessName);
+
+            const navPreview = document.getElementById('nav-logo-preview');
+            const defaultIcon = document.getElementById('default-logo-icon');
+            const logoPreviewEl = document.getElementById('logo-preview-element');
+            const logoPlaceholderIcon = document.getElementById('logo-placeholder-icon');
+
+            if (appState.businessLogo) {
+                if (navPreview) {
+                    navPreview.src = appState.businessLogo;
+                    navPreview.classList.remove('hidden');
+                }
+                if (defaultIcon) defaultIcon.classList.add('hidden');
+                if (logoPreviewEl) {
+                    logoPreviewEl.src = appState.businessLogo;
+                    logoPreviewEl.classList.remove('hidden');
+                }
+                if (logoPlaceholderIcon) logoPlaceholderIcon.classList.add('hidden');
+            } else {
+                if (navPreview) navPreview.classList.add('hidden');
+                if (defaultIcon) defaultIcon.classList.remove('hidden');
+                if (logoPreviewEl) logoPreviewEl.classList.add('hidden');
+                if (logoPlaceholderIcon) logoPlaceholderIcon.classList.remove('hidden');
+            }
+
+            if (document.getElementById('cfg-biz-name')) document.getElementById('cfg-biz-name').value = appState.businessName || '';
+            if (document.getElementById('cfg-biz-phone')) document.getElementById('cfg-biz-phone').value = appState.businessPhone || '';
+            if (document.getElementById('cfg-biz-address')) document.getElementById('cfg-biz-address').value = appState.businessAddress || '';
+            if (document.getElementById('cfg-biz-currency')) document.getElementById('cfg-biz-currency').value = appState.businessCurrency || 'AR$';
+            if (document.getElementById('cfg-biz-footer')) document.getElementById('cfg-biz-footer').value = appState.businessFooter || '';
+        }
+
+        function handleLogoUpload(e) {
+            const file = e.target.files ? e.target.files[0] : null;
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                appState.businessLogo = evt.target.result;
+                saveToLocalStorage();
+                applyBusinessTheme();
+                showToast("Logo actualizado con éxito");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveBusinessConfig() {
+            appState.businessName = document.getElementById('cfg-biz-name').value || "Prento3D";
+            appState.businessPhone = document.getElementById('cfg-biz-phone').value || "";
+            appState.businessAddress = document.getElementById('cfg-biz-address').value || "";
+            appState.businessCurrency = document.getElementById('cfg-biz-currency').value || "AR$";
+            appState.businessFooter = document.getElementById('cfg-biz-footer').value || "";
+
+            saveToLocalStorage();
+            applyBusinessTheme();
+            renderAll();
+            showToast("Ajustes de marca guardados");
+        }
+
+        function updatePrintableLogoAndWatermark() {
+            const headerLogoImg = document.getElementById('pr-header-logo-img');
+            const headerLogoIcon = document.getElementById('pr-header-logo-icon');
+            const watermarkImg = document.getElementById('pr-watermark-img');
+            const watermarkIcon = document.getElementById('pr-watermark-icon');
+
+            if (appState.businessLogo) {
+                if (headerLogoImg) {
+                    headerLogoImg.src = appState.businessLogo;
+                    headerLogoImg.classList.remove('hidden');
+                }
+                if (headerLogoIcon) headerLogoIcon.classList.add('hidden');
+
+                if (watermarkImg) {
+                    watermarkImg.src = appState.businessLogo;
+                    watermarkImg.classList.remove('hidden');
+                }
+                if (watermarkIcon) watermarkIcon.classList.add('hidden');
+            } else {
+                if (headerLogoImg) headerLogoImg.classList.add('hidden');
+                if (headerLogoIcon) headerLogoIcon.classList.remove('hidden');
+
+                if (watermarkImg) watermarkImg.classList.add('hidden');
+                if (watermarkIcon) watermarkIcon.classList.remove('hidden');
+            }
+        }
+
+        function updatePrintableVisibility() {
+            const showOrder = document.getElementById('toggle-print-order-status')?.checked;
+            const showPayment = document.getElementById('toggle-print-payment-status')?.checked;
+
+            const orderBadge = document.getElementById('pr-order-status-badge');
+            const paymentBadge = document.getElementById('pr-payment-status-badge');
+
+            if (orderBadge) {
+                if (showOrder) orderBadge.classList.remove('hidden');
+                else orderBadge.classList.add('hidden');
+            }
+            if (paymentBadge) {
+                if (showPayment) paymentBadge.classList.remove('hidden');
+                else paymentBadge.classList.add('hidden');
+            }
+        }
+
+        function closePrintableModal() {
+            document.getElementById('modal-printable').classList.add('hidden');
+        }
+
+        function openConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            confirmActionCallback = onConfirm;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('modal-confirm').classList.add('hidden');
+            confirmActionCallback = null;
+        }
+
+        function triggerConfirmAction() {
+            if (confirmActionCallback) confirmActionCallback();
+            closeConfirmModal();
+        }
+
+        /* --- CALCULADORA EREXIT 3D --- */
+        function applyPrinterPreset() {
+            const val = document.getElementById('calc-printer-preset').value;
+            const wattsInput = document.getElementById('calc-printer-watts');
+            if (val !== 'custom') {
+                wattsInput.value = val;
+            }
+            runCalculator();
+        }
+
+        function setMultiplier(val) {
+            currentMultiplier = parseFloat(val) || 1;
+            document.getElementById('calc-custom-mult').value = currentMultiplier;
+            
+            document.querySelectorAll('.btn-mult').forEach(b => {
+                const bVal = parseFloat(b.getAttribute('data-val'));
+                if (bVal === currentMultiplier) {
+                    b.className = "btn-mult py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md";
+                } else {
+                    b.className = "btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700";
+                }
+            });
+            runCalculator();
+        }
+
+        function setCustomMultiplier(val) {
+            currentMultiplier = parseFloat(val) || 1;
+            document.querySelectorAll('.btn-mult').forEach(b => {
+                const bVal = parseFloat(b.getAttribute('data-val'));
+                if (bVal === currentMultiplier) {
+                    b.className = "btn-mult py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-md";
+                } else {
+                    b.className = "btn-mult py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-200 border border-slate-700";
+                }
+            });
+            runCalculator();
+        }
+
+        function runCalculator() {
+            const filPrice = parseFloat(document.getElementById('calc-fil-price')?.value) || 0;
+            const kwhPrice = parseFloat(document.getElementById('calc-kwh-price')?.value) || 0;
+            const printerWatts = parseFloat(document.getElementById('calc-printer-watts')?.value) || 0;
+            const machineLifespan = parseFloat(document.getElementById('calc-machine-lifespan')?.value) || 1;
+            const partsCost = parseFloat(document.getElementById('calc-parts-cost')?.value) || 0;
+            const errorMarginPct = parseFloat(document.getElementById('calc-error-margin')?.value) || 0;
+
+            const hours = parseFloat(document.getElementById('calc-piece-hours')?.value) || 0;
+            const minutes = parseFloat(document.getElementById('calc-piece-minutes')?.value) || 0;
+            const totalHours = hours + (minutes / 60);
+
+            const grams = parseFloat(document.getElementById('calc-piece-grams')?.value) || 0;
+            const extraInsumos = parseFloat(document.getElementById('calc-piece-extras')?.value) || 0;
+
+            // Cálculos
+            const costMaterial = (grams / 1000) * filPrice;
+            const costLuz = totalHours * (printerWatts / 1000) * kwhPrice;
+            const costDesgaste = totalHours * (partsCost / machineLifespan);
+            
+            const subtotalSinError = costMaterial + costLuz + costDesgaste;
+            const costError = subtotalSinError * (errorMarginPct / 100);
+
+            const costoTotalBase = subtotalSinError + costError;
+            const insumosCon30 = extraInsumos * 1.30;
+
+            const totalCobrar = (costoTotalBase * currentMultiplier) + insumosCon30;
+            const precioML = totalCobrar * 1.15; // Comisión ML aprox +15%
+
+            const curr = appState.businessCurrency || 'AR$';
+
+            document.getElementById('res-material').innerText = `${curr} ${costMaterial.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('res-luz').innerText = `${curr} ${costLuz.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('res-desgaste').innerText = `${curr} ${costDesgaste.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('res-error').innerText = `${curr} ${costError.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            document.getElementById('res-costo-base').innerText = `${curr} ${costoTotalBase.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('res-insumos').innerText = `${curr} ${insumosCon30.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            document.getElementById('res-total-cobrar').innerText = `${curr} ${totalCobrar.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('res-precio-ml').innerText = `${curr} ${precioML.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        function saveCalcToProduct() {
+            const pieceName = document.getElementById('calc-piece-name')?.value.trim() || 'Nuevo Modelo 3D';
+            const grams = parseFloat(document.getElementById('calc-piece-grams')?.value) || 0;
+            const hours = parseFloat(document.getElementById('calc-piece-hours')?.value) || 0;
+            
+            const priceText = document.getElementById('res-total-cobrar')?.innerText.replace(/[^0-9,.]/g, '').replace(',', '.');
+            const calculatedPrice = Math.round(parseFloat(priceText) || 0);
+
+            const newProd = {
+                id: 'p' + Date.now(),
+                name: pieceName,
+                weight: grams,
+                hours: hours,
+                price: calculatedPrice,
+                category: appState.folders[0] || 'General',
+                updatedAt: new Date().toISOString().split('T')[0]
+            };
+
+            appState.products.push(newProd);
+            saveToLocalStorage();
+            renderProducts();
+            switchTab('catalogo');
+            showToast(`Producto "${pieceName}" guardado en catálogo`);
+        }
+
+        /* --- CARPETAS Y CATALOGO DE PRODUCTOS --- */
+        function openFolderModal() {
+            document.getElementById('folder-name-input').value = '';
+            document.getElementById('modal-folder').classList.remove('hidden');
+        }
+        function closeFolderModal() {
+            document.getElementById('modal-folder').classList.add('hidden');
+        }
+        function saveFolder() {
+            const name = document.getElementById('folder-name-input').value.trim();
+            if(!name) return showToast("El nombre de la carpeta no puede estar vacío", true);
+            if(appState.folders.includes(name)) return showToast("Ya existe una carpeta con ese nombre", true);
+            
+            appState.folders.push(name);
+            saveToLocalStorage();
+            renderFolderPills();
+            closeFolderModal();
+            showToast(`Carpeta "${name}" creada`);
+        }
+
+        function setFolderFilter(f) {
+            appState.selectedFolder = f;
+            renderFolderPills();
+            renderProducts();
+        }
+
+        function renderFolderPills() {
+            const container = document.getElementById('folder-pills-container');
+            if(!container) return;
+
+            let html = `<button type="button" onclick="setFolderFilter('Todos')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition ${appState.selectedFolder === 'Todos' ? 'bg-brand-500 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}">Todas las Carpetas</button>`;
+
+            appState.folders.forEach(f => {
+                const isActive = appState.selectedFolder === f;
+                html += `
+                    <div class="inline-flex items-center gap-1 bg-slate-800 border border-slate-700/60 rounded-xl px-2.5 py-1 text-xs font-bold ${isActive ? 'border-brand-500 text-white' : 'text-slate-300'}">
+                        <button type="button" onclick="setFolderFilter('${f}')" class="hover:text-brand-500 flex items-center gap-1">
+                            <i data-lucide="folder" class="w-3.5 h-3.5 ${isActive ? 'text-brand-500' : 'text-slate-400'} pointer-events-none"></i>
+                            ${f}
+                        </button>
+                        ${f !== 'General' ? `<button type="button" onclick="deleteFolder('${f}')" class="text-slate-500 hover:text-red-400 ml-1"><i data-lucide="x" class="w-3 h-3 pointer-events-none"></i></button>` : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            refreshIcons();
+        }
+
+        function deleteFolder(f) {
+            openConfirmModal("Eliminar Carpeta", `¿Seguro que deseas eliminar la carpeta "${f}"? Los productos volverán a la carpeta General.`, () => {
+                appState.folders = appState.folders.filter(item => item !== f);
+                appState.products.forEach(p => {
+                    if (p.category === f) p.category = 'General';
+                });
+                if (appState.selectedFolder === f) appState.selectedFolder = 'Todos';
+                saveToLocalStorage();
+                renderFolderPills();
+                renderProducts();
+                showToast(`Carpeta "${f}" eliminada`);
+            });
+        }
+
+        function openProductModal(id = null) {
+            editingProductId = id;
+            const select = document.getElementById('p-category-select');
+            select.innerHTML = appState.folders.map(f => `<option value="${f}">${f}</option>`).join('');
+
+            if(id) {
+                const p = appState.products.find(item => item.id === id);
+                if(p) {
+                    document.getElementById('product-modal-title').innerText = "Editar Producto";
+                    document.getElementById('p-name').value = p.name;
+                    document.getElementById('p-weight').value = p.weight;
+                    document.getElementById('p-hours').value = p.hours;
+                    document.getElementById('p-price').value = p.price;
+                    select.value = p.category || 'General';
+                }
+            } else {
+                document.getElementById('product-modal-title').innerText = "Nuevo Producto";
+                document.getElementById('p-name').value = '';
+                document.getElementById('p-weight').value = 0;
+                document.getElementById('p-hours').value = 0;
+                document.getElementById('p-price').value = 0;
+                select.value = appState.selectedFolder !== 'Todos' ? appState.selectedFolder : (appState.folders[0] || 'General');
+            }
+            document.getElementById('modal-product').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('modal-product').classList.add('hidden');
+            editingProductId = null;
+        }
+
+        function saveProduct() {
+            const name = document.getElementById('p-name').value.trim();
+            const weight = parseFloat(document.getElementById('p-weight').value) || 0;
+            const hours = parseFloat(document.getElementById('p-hours').value) || 0;
+            const price = parseFloat(document.getElementById('p-price').value) || 0;
+            const category = document.getElementById('p-category-select').value || 'General';
+
+            if(!name) return showToast("El nombre del producto es obligatorio", true);
+
+            if(editingProductId) {
+                const p = appState.products.find(item => item.id === editingProductId);
+                if(p) {
+                    p.name = name;
+                    p.weight = weight;
+                    p.hours = hours;
+                    p.price = price;
+                    p.category = category;
+                    p.updatedAt = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                appState.products.push({
+                    id: 'p' + Date.now(),
+                    name, weight, hours, price, category,
+                    updatedAt: new Date().toISOString().split('T')[0]
+                });
+            }
+
+            saveToLocalStorage();
+            renderProducts();
+            closeProductModal();
+            showToast(editingProductId ? "Producto actualizado" : "Producto creado");
+        }
+
+        function deleteProduct(id) {
+            openConfirmModal("Eliminar Producto", "¿Deseas quitar este modelo del catálogo?", () => {
+                appState.products = appState.products.filter(p => p.id !== id);
+                saveToLocalStorage();
+                renderProducts();
+                showToast("Producto eliminado");
+            });
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            if(!grid) return;
+
+            const search = document.getElementById('product-search')?.value.toLowerCase() || '';
+            const sort = document.getElementById('product-sort')?.value || 'name-asc';
+
+            let filtered = appState.products.filter(p => {
+                const matchFolder = appState.selectedFolder === 'Todos' || p.category === appState.selectedFolder;
+                const matchSearch = p.name.toLowerCase().includes(search);
+                return matchFolder && matchSearch;
+            });
+
+            // Ordenamiento
+            filtered.sort((a, b) => {
+                if(sort === 'name-asc') return a.name.localeCompare(b.name);
+                if(sort === 'name-desc') return b.name.localeCompare(a.name);
+                if(sort === 'price-desc') return b.price - a.price;
+                if(sort === 'price-asc') return a.price - b.price;
+                if(sort === 'updated-desc') return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+                if(sort === 'updated-asc') return (a.updatedAt || '').localeCompare(b.updatedAt || '');
+                return 0;
+            });
+
+            const curr = appState.businessCurrency || 'AR$';
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No hay productos guardados en esta carpeta o búsqueda.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3 hover:border-slate-700 transition">
+                    <div>
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="px-2 py-0.5 bg-slate-800 text-brand-500 rounded-lg text-[10px] font-bold uppercase tracking-wider">${p.category || 'General'}</span>
+                            <div class="flex items-center gap-1">
+                                <button type="button" onclick="openProductModal('${p.id}')" class="text-slate-400 hover:text-white p-1"><i data-lucide="edit" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+                                <button type="button" onclick="deleteProduct('${p.id}')" class="text-slate-400 hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-sm mt-2 text-slate-100">${p.name}</h4>
+                        <div class="flex gap-3 text-[11px] text-slate-400 mt-2">
+                            <span>⚖️ ${p.weight}g</span>
+                            <span>⏱️ ${p.hours}h</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-800/80 pt-2 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500">Editado: ${p.updatedAt || '-'}</span>
+                        <span class="text-base font-black text-brand-accent">${curr} ${p.price.toLocaleString()}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            refreshIcons();
+        }
+
+        /* --- CLIENTES --- */
+        function openClientModal(id = null) {
+            editingClientId = id;
+            if(id) {
+                const c = appState.clients.find(item => item.id === id);
+                if(c) {
+                    document.getElementById('client-modal-title').innerText = "Editar Cliente";
+                    document.getElementById('c-name').value = c.name;
+                    document.getElementById('c-phone').value = c.phone;
+                    document.getElementById('c-notes').value = c.notes;
+                }
+            } else {
+                document.getElementById('client-modal-title').innerText = "Nuevo Cliente";
+                document.getElementById('c-name').value = '';
+                document.getElementById('c-phone').value = '';
+                document.getElementById('c-notes').value = '';
+            }
+            document.getElementById('modal-client').classList.remove('hidden');
+        }
+
+        function closeClientModal() {
+            document.getElementById('modal-client').classList.add('hidden');
+            editingClientId = null;
+        }
+
+        function saveClient() {
+            const name = document.getElementById('c-name').value.trim();
+            const phone = document.getElementById('c-phone').value.trim();
+            const notes = document.getElementById('c-notes').value.trim();
+
+            if(!name) return showToast("El nombre del cliente es obligatorio", true);
+
+            if(editingClientId) {
+                const c = appState.clients.find(item => item.id === editingClientId);
+                if(c) {
+                    c.name = name;
+                    c.phone = phone;
+                    c.notes = notes;
+                }
+            } else {
+                appState.clients.push({
+                    id: 'c' + Date.now(),
+                    name, phone, notes,
+                    createdAt: new Date().toISOString().split('T')[0]
+                });
+            }
+
+            saveToLocalStorage();
+            renderClients();
+            closeClientModal();
+            showToast(editingClientId ? "Cliente actualizado" : "Cliente agregado");
+        }
+
+        function deleteClient(id) {
+            openConfirmModal("Eliminar Cliente", "¿Deseas borrar a este cliente del directorio?", () => {
+                appState.clients = appState.clients.filter(c => c.id !== id);
+                saveToLocalStorage();
+                renderClients();
+                showToast("Cliente eliminado");
+            });
+        }
+
+        function renderClients() {
+            const tbody = document.getElementById('clients-table-body');
+            if(!tbody) return;
+
+            const search = document.getElementById('client-search')?.value.toLowerCase() || '';
+            const sort = document.getElementById('client-sort')?.value || 'name-asc';
+
+            let filtered = appState.clients.filter(c => {
+                return c.name.toLowerCase().includes(search) || (c.phone || '').includes(search);
+            });
+
+            filtered.sort((a, b) => {
+                if(sort === 'name-asc') return a.name.localeCompare(b.name);
+                if(sort === 'name-desc') return b.name.localeCompare(a.name);
+                if(sort === 'date-desc') return (b.createdAt || '').localeCompare(a.createdAt || '');
+                if(sort === 'date-asc') return (a.createdAt || '').localeCompare(b.createdAt || '');
+                return 0;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">No se encontraron clientes registrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => {
+                const countOrders = appState.orders.filter(o => o.clientId === c.id).length;
+                return `
+                    <tr class="hover:bg-slate-900/50">
+                        <td class="py-3 px-5 font-bold text-slate-200">${c.name}</td>
+                        <td class="py-3 px-5 text-slate-400">${c.phone || '-'}</td>
+                        <td class="py-3 px-5 text-slate-400 max-w-xs truncate">${c.notes || '-'}</td>
+                        <td class="py-3 px-5 text-center font-bold text-brand-500">${countOrders}</td>
+                        <td class="py-3 px-5 text-right">
+                            <button type="button" onclick="openClientModal('${c.id}')" class="text-slate-400 hover:text-white mr-2"><i data-lucide="edit" class="w-4 h-4 pointer-events-none inline"></i></button>
+                            <button type="button" onclick="deleteClient('${c.id}')" class="text-slate-400 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none inline"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            refreshIcons();
+        }
+
+        /* --- PRESUPUESTOS --- */
+        function openPresupuestoModal(id = null) {
+            editingPresupuestoId = id;
+            const selectClient = document.getElementById('pres-client');
+            selectClient.innerHTML = appState.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            const itemsContainer = document.getElementById('pres-items-container');
+            itemsContainer.innerHTML = '';
+
+            if(id) {
+                const p = appState.presupuestos.find(item => item.id === id);
+                if(p) {
+                    document.getElementById('presupuesto-modal-title').innerText = "Editar Presupuesto";
+                    selectClient.value = p.clientId;
+                    document.getElementById('pres-validity').value = p.validityDays;
+                    document.getElementById('pres-status').value = p.status;
+                    document.getElementById('pres-notes').value = p.notes || '';
+
+                    p.items.forEach(it => addPresupuestoItemRow(it.description, it.quantity, it.unitPrice));
+                }
+            } else {
+                document.getElementById('presupuesto-modal-title').innerText = "Nuevo Presupuesto";
+                document.getElementById('pres-validity').value = 15;
+                document.getElementById('pres-status').value = "Borrador";
+                document.getElementById('pres-notes').value = '';
+                addPresupuestoItemRow();
+            }
+
+            calcPresupuestoTotal();
+            document.getElementById('modal-presupuesto').classList.remove('hidden');
+        }
+
+        function closePresupuestoModal() {
+            document.getElementById('modal-presupuesto').classList.add('hidden');
+            editingPresupuestoId = null;
+        }
+
+        function addPresupuestoItemRow(desc = '', qty = 1, price = 0) {
+            const container = document.getElementById('pres-items-container');
+            const rowId = 'pres-row-' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center";
+            div.id = rowId;
+            div.innerHTML = `
+                <input type="text" class="pres-item-desc flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100" placeholder="Descripción del trabajo / pieza" value="${desc}">
+                <input type="number" oninput="calcPresupuestoTotal()" class="pres-item-qty w-16 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-center font-bold text-slate-100" value="${qty}">
+                <input type="number" oninput="calcPresupuestoTotal()" class="pres-item-price w-24 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-right font-bold text-slate-100" value="${price}">
+                <button type="button" onclick="document.getElementById('${rowId}').remove(); calcPresupuestoTotal()" class="text-slate-500 hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+            `;
+            container.appendChild(div);
+            refreshIcons();
+        }
+
+        function calcPresupuestoTotal() {
+            let total = 0;
+            const rows = document.querySelectorAll('#pres-items-container > div');
+            rows.forEach(r => {
+                const qty = parseFloat(r.querySelector('.pres-item-qty')?.value) || 0;
+                const price = parseFloat(r.querySelector('.pres-item-price')?.value) || 0;
+                total += (qty * price);
+            });
+
+            const curr = appState.businessCurrency || 'AR$';
+            document.getElementById('pres-total-display').innerText = `${curr} ${total.toLocaleString()}`;
+            return total;
+        }
+
+        function savePresupuesto() {
+            const clientId = document.getElementById('pres-client').value;
+            const validityDays = parseInt(document.getElementById('pres-validity').value) || 15;
+            const status = document.getElementById('pres-status').value;
+            const notes = document.getElementById('pres-notes').value.trim();
+            const total = calcPresupuestoTotal();
+
+            const items = [];
+            document.querySelectorAll('#pres-items-container > div').forEach(r => {
+                const description = r.querySelector('.pres-item-desc').value.trim();
+                const quantity = parseFloat(r.querySelector('.pres-item-qty').value) || 0;
+                const unitPrice = parseFloat(r.querySelector('.pres-item-price').value) || 0;
+                if(description) items.push({ description, quantity, unitPrice });
+            });
+
+            if(items.length === 0) return showToast("Ingresa al menos un ítem al presupuesto", true);
+
+            if(editingPresupuestoId) {
+                const p = appState.presupuestos.find(item => item.id === editingPresupuestoId);
+                if(p) {
+                    p.clientId = clientId;
+                    p.validityDays = validityDays;
+                    p.status = status;
+                    p.notes = notes;
+                    p.items = items;
+                    p.total = total;
+                }
+            } else {
+                appState.presupuestos.push({
+                    id: 'pres-' + Math.floor(100 + Math.random() * 900),
+                    clientId,
+                    date: new Date().toISOString().split('T')[0],
+                    validityDays,
+                    items,
+                    status,
+                    notes,
+                    total
+                });
+            }
+
+            saveToLocalStorage();
+            renderPresupuestos();
+            closePresupuestoModal();
+            showToast("Presupuesto guardado correctamente");
+        }
+
+        function deletePresupuesto(id) {
+            openConfirmModal("Eliminar Presupuesto", "¿Deseas eliminar este presupuesto?", () => {
+                appState.presupuestos = appState.presupuestos.filter(p => p.id !== id);
+                saveToLocalStorage();
+                renderPresupuestos();
+                showToast("Presupuesto eliminado");
+            });
+        }
+
+        function renderPresupuestos() {
+            const grid = document.getElementById('presupuestos-grid');
+            if(!grid) return;
+
+            const search = document.getElementById('presupuesto-search')?.value.toLowerCase() || '';
+            const filterStatus = document.getElementById('presupuesto-filter-status')?.value || 'all';
+            const sort = document.getElementById('presupuesto-sort')?.value || 'date-desc';
+
+            let filtered = appState.presupuestos.filter(p => {
+                const client = appState.clients.find(c => c.id === p.clientId) || { name: '' };
+                const matchSearch = client.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search);
+                const matchStatus = filterStatus === 'all' || p.status === filterStatus;
+                return matchSearch && matchStatus;
+            });
+
+            filtered.sort((a, b) => {
+                if(sort === 'date-desc') return b.date.localeCompare(a.date);
+                if(sort === 'date-asc') return a.date.localeCompare(b.date);
+                if(sort === 'total-desc') return b.total - a.total;
+                if(sort === 'total-asc') return a.total - b.total;
+                return 0;
+            });
+
+            const curr = appState.businessCurrency || 'AR$';
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No hay presupuestos registrados.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => {
+                const client = appState.clients.find(c => c.id === p.clientId) || { name: 'Cliente borrado' };
+                return `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between hover:border-slate-700 transition">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">${p.status}</span>
+                                <span class="text-xs font-bold text-slate-500">${p.id}</span>
+                            </div>
+                            <h4 class="font-black text-base mt-3 text-slate-100">${client.name}</h4>
+                            <p class="text-xs text-slate-400 mt-1">Fecha: ${p.date} (${p.validityDays} días validez)</p>
+                            <p class="text-xs text-slate-500 italic mt-2 line-clamp-2">${p.notes || 'Sin observaciones'}</p>
+                        </div>
+                        <div class="border-t border-slate-800 pt-3 flex items-center justify-between">
+                            <span class="text-lg font-black text-amber-400">${curr} ${p.total.toLocaleString()}</span>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="printPresupuesto('${p.id}')" title="Imprimir / Ver Recibo" class="p-2 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-xl"><i data-lucide="printer" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button type="button" onclick="openPresupuestoModal('${p.id}')" title="Editar" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl"><i data-lucide="edit" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button type="button" onclick="deletePresupuesto('${p.id}')" title="Eliminar" class="p-2 bg-slate-800 hover:bg-slate-700 text-red-400 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            refreshIcons();
+        }
+
+        /* --- VENTAS / PEDIDOS --- */
+        function openNewOrderModal(id = null) {
+            editingOrderId = id;
+            const selectClient = document.getElementById('o-client');
+            selectClient.innerHTML = appState.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            const container = document.getElementById('order-products-container');
+            container.innerHTML = '';
+
+            if(id) {
+                const o = appState.orders.find(item => item.id === id);
+                if(o) {
+                    document.getElementById('order-modal-title').innerText = "Editar Venta";
+                    selectClient.value = o.clientId;
+                    document.getElementById('o-status').value = o.status;
+                    document.getElementById('o-payment-method').value = o.paymentMethod || 'Efectivo';
+                    document.getElementById('o-deposit').value = o.deposit || 0;
+                    document.getElementById('o-payment-status').value = o.paymentStatus || 'Impago';
+
+                    o.products.forEach(p => addProductRowToOrder(p.productId, p.quantity, p.price));
+                }
+            } else {
+                document.getElementById('order-modal-title').innerText = "Registrar Venta";
+                document.getElementById('o-status').value = "Pendiente";
+                document.getElementById('o-payment-method').value = "Efectivo";
+                document.getElementById('o-deposit').value = 0;
+                document.getElementById('o-payment-status').value = "Impago";
+                addProductRowToOrder();
+            }
+
+            calcOrderTotal();
+            document.getElementById('modal-order').classList.remove('hidden');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('modal-order').classList.add('hidden');
+            editingOrderId = null;
+        }
+
+        function addProductRowToOrder(prodId = '', qty = 1, price = 0) {
+            const container = document.getElementById('order-products-container');
+            const rowId = 'ord-row-' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+            const options = appState.products.map(p => `<option value="${p.id}" data-price="${p.price}">${p.name} (${appState.businessCurrency || 'AR$'} ${p.price.toLocaleString()})</option>`).join('');
+
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center";
+            div.id = rowId;
+            div.innerHTML = `
+                <select onchange="updateOrderRowPrice(this)" class="ord-prod-id flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100">
+                    <option value="">Seleccionar Producto...</option>
+                    ${options}
+                </select>
+                <input type="number" oninput="calcOrderTotal()" class="ord-prod-qty w-16 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-center font-bold text-slate-100" value="${qty}">
+                <input type="number" oninput="calcOrderTotal()" class="ord-prod-price w-24 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1.5 text-xs text-right font-bold text-slate-100" value="${price}">
+                <button type="button" onclick="document.getElementById('${rowId}').remove(); calcOrderTotal()" class="text-slate-500 hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+            `;
+            container.appendChild(div);
+
+            if(prodId) {
+                div.querySelector('.ord-prod-id').value = prodId;
+                div.querySelector('.ord-prod-price').value = price;
+            }
+
+            refreshIcons();
+        }
+
+        function updateOrderRowPrice(selectEl) {
+            const row = selectEl.closest('div');
+            const selectedOpt = selectEl.options[selectEl.selectedIndex];
+            const price = parseFloat(selectedOpt.getAttribute('data-price')) || 0;
+            row.querySelector('.ord-prod-price').value = price;
+            calcOrderTotal();
+        }
+
+        function calcOrderTotal() {
+            let total = 0;
+            document.querySelectorAll('#order-products-container > div').forEach(r => {
+                const qty = parseFloat(r.querySelector('.ord-prod-qty')?.value) || 0;
+                const price = parseFloat(r.querySelector('.ord-prod-price')?.value) || 0;
+                total += (qty * price);
+            });
+
+            document.getElementById('o-total').value = total;
+            return total;
+        }
+
+        function saveOrder() {
+            const clientId = document.getElementById('o-client').value;
+            const status = document.getElementById('o-status').value;
+            const paymentMethod = document.getElementById('o-payment-method').value;
+            const deposit = parseFloat(document.getElementById('o-deposit').value) || 0;
+            const paymentStatus = document.getElementById('o-payment-status').value;
+            const total = calcOrderTotal();
+
+            const products = [];
+            document.querySelectorAll('#order-products-container > div').forEach(r => {
+                const productId = r.querySelector('.ord-prod-id').value;
+                const quantity = parseFloat(r.querySelector('.ord-prod-qty').value) || 0;
+                const price = parseFloat(r.querySelector('.ord-prod-price').value) || 0;
+                if(productId) products.push({ productId, quantity, price });
+            });
+
+            if(products.length === 0) return showToast("Selecciona al menos un producto para registrar la venta", true);
+
+            if(editingOrderId) {
+                const o = appState.orders.find(item => item.id === editingOrderId);
+                if(o) {
+                    o.clientId = clientId;
+                    o.status = status;
+                    o.paymentMethod = paymentMethod;
+                    o.deposit = deposit;
+                    o.paymentStatus = paymentStatus;
+                    o.products = products;
+                    o.total = total;
+                }
+            } else {
+                appState.orders.push({
+                    id: 'ped-' + Math.floor(100 + Math.random() * 900),
+                    clientId,
+                    date: new Date().toISOString().split('T')[0],
+                    products,
+                    status,
+                    paymentStatus,
+                    paymentMethod,
+                    deposit,
+                    total
+                });
+            }
+
+            saveToLocalStorage();
+            renderOrders();
+            renderDashboardKPIs();
+            closeOrderModal();
+            showToast("Venta registrada exitosamente");
+        }
+
+        function deleteOrder(id) {
+            openConfirmModal("Eliminar Venta", "¿Deseas anular y borrar este pedido?", () => {
+                appState.orders = appState.orders.filter(o => o.id !== id);
+                saveToLocalStorage();
+                renderOrders();
+                renderDashboardKPIs();
+                showToast("Venta eliminada");
+            });
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('orders-list');
+            if(!container) return;
+
+            const search = document.getElementById('order-search')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('filter-order-status')?.value || 'all';
+            const payFilter = document.getElementById('filter-payment-status')?.value || 'all';
+            const sort = document.getElementById('order-sort')?.value || 'date-desc';
+
+            let filtered = appState.orders.filter(o => {
+                const client = appState.clients.find(c => c.id === o.clientId) || { name: '' };
+                const matchSearch = client.name.toLowerCase().includes(search) || o.id.toLowerCase().includes(search);
+                const matchStatus = statusFilter === 'all' || o.status === statusFilter;
+                const matchPay = payFilter === 'all' || o.paymentStatus === payFilter;
+                return matchSearch && matchStatus && matchPay;
+            });
+
+            filtered.sort((a, b) => {
+                if(sort === 'date-desc') return b.date.localeCompare(a.date);
+                if(sort === 'date-asc') return a.date.localeCompare(b.date);
+                if(sort === 'total-desc') return b.total - a.total;
+                return 0;
+            });
+
+            const curr = appState.businessCurrency || 'AR$';
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-slate-500 text-xs">No hay ventas registradas con estos filtros.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(o => {
+                const client = appState.clients.find(c => c.id === o.clientId) || { name: 'Cliente no encontrado' };
+                return `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black text-brand-500">${o.id}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-500/10 text-brand-500">${o.status}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400">${o.paymentStatus}</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-100">${client.name}</h4>
+                            <p class="text-xs text-slate-400">Fecha: ${o.date} | Medio: ${o.paymentMethod || 'Efectivo'}</p>
+                        </div>
+                        <div class="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 border-slate-800 pt-2 md:pt-0">
+                            <div class="text-right">
+                                <span class="block text-xs text-slate-400">Total</span>
+                                <span class="text-lg font-black text-emerald-400">${curr} ${o.total.toLocaleString()}</span>
+                            </div>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="printOrder('${o.id}')" title="Comprobante" class="p-2 bg-slate-800 hover:bg-slate-700 text-brand-500 rounded-xl"><i data-lucide="printer" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button type="button" onclick="openNewOrderModal('${o.id}')" title="Editar" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl"><i data-lucide="edit" class="w-4 h-4 pointer-events-none"></i></button>
+                                <button type="button" onclick="deleteOrder('${o.id}')" title="Eliminar" class="p-2 bg-slate-800 hover:bg-slate-700 text-red-400 rounded-xl"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            refreshIcons();
+        }
+
+        /* --- CONTROL DE TALLER / FICHAS --- */
+        function openProductionSheetModal(id = null) {
+            editingSheetId = id;
+            const selectClient = document.getElementById('sh-client');
+            selectClient.innerHTML = appState.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            if(id) {
+                const s = appState.productionSheets.find(item => item.id === id);
+                if(s) {
+                    document.getElementById('prod-sheet-modal-title').innerText = "Editar Ficha Técnica";
+                    document.getElementById('sh-title').value = s.title;
+                    selectClient.value = s.clientId;
+                    document.getElementById('sh-hours').value = s.hours;
+                    document.getElementById('sh-minutes').value = s.minutes;
+                    document.getElementById('sh-notes').value = s.notes || '';
+                }
+            } else {
+                document.getElementById('prod-sheet-modal-title').innerText = "Nueva Ficha Técnica";
+                document.getElementById('sh-title').value = '';
+                document.getElementById('sh-hours').value = 0;
+                document.getElementById('sh-minutes').value = 0;
+                document.getElementById('sh-notes').value = '';
+            }
+            document.getElementById('modal-production-sheet').classList.remove('hidden');
+        }
+
+        function closeProductionSheetModal() {
+            document.getElementById('modal-production-sheet').classList.add('hidden');
+            editingSheetId = null;
+        }
+
+        function saveProductionSheet() {
+            const title = document.getElementById('sh-title').value.trim();
+            const clientId = document.getElementById('sh-client').value;
+            const hours = parseInt(document.getElementById('sh-hours').value) || 0;
+            const minutes = parseInt(document.getElementById('sh-minutes').value) || 0;
+            const notes = document.getElementById('sh-notes').value.trim();
+
+            if(!title) return showToast("El nombre del proyecto es obligatorio", true);
+
+            if(editingSheetId) {
+                const s = appState.productionSheets.find(item => item.id === editingSheetId);
+                if(s) {
+                    s.title = title;
+                    s.clientId = clientId;
+                    s.hours = hours;
+                    s.minutes = minutes;
+                    s.notes = notes;
+                }
+            } else {
+                appState.productionSheets.push({
+                    id: 'sh-' + Date.now(),
+                    title, clientId, hours, minutes, notes,
+                    createdAt: new Date().toISOString().split('T')[0]
+                });
+            }
+
+            saveToLocalStorage();
+            renderProductionSheets();
+            closeProductionSheetModal();
+            showToast("Ficha técnica guardada");
+        }
+
+        function deleteProductionSheet(id) {
+            openConfirmModal("Eliminar Ficha", "¿Borrar este registro del taller?", () => {
+                appState.productionSheets = appState.productionSheets.filter(s => s.id !== id);
+                saveToLocalStorage();
+                renderProductionSheets();
+                showToast("Ficha técnica eliminada");
+            });
+        }
+
+        function renderProductionSheets() {
+            const grid = document.getElementById('production-sheets-grid');
+            if(!grid) return;
+
+            if(appState.productionSheets.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500 text-xs">No hay fichas técnicas guardadas.</div>`;
+                return;
+            }
+
+            grid.innerHTML = appState.productionSheets.map(s => {
+                const client = appState.clients.find(c => c.id === s.clientId) || { name: 'Cliente' };
+                return `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 hover:border-slate-700 transition">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-sm text-slate-100">${s.title}</h4>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="openProductionSheetModal('${s.id}')" class="text-slate-400 hover:text-white"><i data-lucide="edit" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+                                <button type="button" onclick="deleteProductionSheet('${s.id}')" class="text-slate-400 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-brand-500 font-semibold">${client.name}</p>
+                        <p class="text-xs text-slate-400 font-bold">⏱️ Tiempo estimado: ${s.hours}h ${s.minutes}m</p>
+                        <p class="text-xs text-slate-500 bg-slate-950 p-2.5 rounded-xl border border-slate-800 italic">${s.notes || 'Sin observaciones adicionales'}</p>
+                    </div>
+                `;
+            }).join('');
+
+            refreshIcons();
+        }
+
+        /* --- MÁQUINAS Y FILAMENTOS --- */
+        function openMachineModal(id = null) {
+            editingMachineId = id;
+            if(id) {
+                const m = appState.machines.find(item => item.id === id);
+                if(m) {
+                    document.getElementById('machine-modal-title').innerText = "Editar Impresora";
+                    document.getElementById('m-name').value = m.name;
+                    document.getElementById('m-model').value = m.model;
+                    document.getElementById('m-status').value = m.status;
+                }
+            } else {
+                document.getElementById('machine-modal-title').innerText = "Nueva Impresora";
+                document.getElementById('m-name').value = '';
+                document.getElementById('m-model').value = '';
+                document.getElementById('m-status').value = "Libre";
+            }
+            document.getElementById('modal-machine').classList.remove('hidden');
+        }
+
+        function closeMachineModal() {
+            document.getElementById('modal-machine').classList.add('hidden');
+            editingMachineId = null;
+        }
+
+        function saveMachine() {
+            const name = document.getElementById('m-name').value.trim();
+            const model = document.getElementById('m-model').value.trim();
+            const status = document.getElementById('m-status').value;
+
+            if(!name) return showToast("El nombre de la impresora es obligatorio", true);
+
+            if(editingMachineId) {
+                const m = appState.machines.find(item => item.id === editingMachineId);
+                if(m) {
+                    m.name = name;
+                    m.model = model;
+                    m.status = status;
+                }
+            } else {
+                appState.machines.push({
+                    id: 'm' + Date.now(),
+                    name, model, status
+                });
+            }
+
+            saveToLocalStorage();
+            renderMachines();
+            renderDashboardKPIs();
+            closeMachineModal();
+            showToast("Máquina guardada");
+        }
+
+        function deleteMachine(id) {
+            openConfirmModal("Eliminar Máquina", "¿Deseas eliminar este equipo?", () => {
+                appState.machines = appState.machines.filter(m => m.id !== id);
+                saveToLocalStorage();
+                renderMachines();
+                renderDashboardKPIs();
+                showToast("Máquina eliminada");
+            });
+        }
+
+        function renderMachines() {
+            const grid = document.getElementById('machines-grid');
+            if(!grid) return;
+
+            grid.innerHTML = appState.machines.map(m => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                    <div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${m.status === 'Libre' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">${m.status}</span>
+                        <h4 class="font-bold text-sm text-slate-100 mt-1">${m.name}</h4>
+                        <p class="text-xs text-slate-400">${m.model}</p>
+                    </div>
+                    <div class="flex gap-1">
+                        <button type="button" onclick="openMachineModal('${m.id}')" class="p-1.5 text-slate-400 hover:text-white"><i data-lucide="edit" class="w-4 h-4 pointer-events-none"></i></button>
+                        <button type="button" onclick="deleteMachine('${m.id}')" class="p-1.5 text-slate-400 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            refreshIcons();
+        }
+
+        function openFilamentModal(id = null) {
+            editingFilamentId = id;
+            if(id) {
+                const f = appState.filaments.find(item => item.id === id);
+                if(f) {
+                    document.getElementById('filament-modal-title').innerText = "Editar Filamento";
+                    document.getElementById('f-material').value = f.material;
+                    document.getElementById('f-color').value = f.color;
+                    document.getElementById('f-weight').value = f.weight;
+                    document.getElementById('f-cost').value = f.cost;
+                    document.getElementById('f-brand').value = f.brand;
+                }
+            } else {
+                document.getElementById('filament-modal-title').innerText = "Registrar Filamento";
+                document.getElementById('f-material').value = 'PLA';
+                document.getElementById('f-color').value = '';
+                document.getElementById('f-weight').value = 1000;
+                document.getElementById('f-cost').value = 22000;
+                document.getElementById('f-brand').value = '';
+            }
+            document.getElementById('modal-filament').classList.remove('hidden');
+        }
+
+        function closeFilamentModal() {
+            document.getElementById('modal-filament').classList.add('hidden');
+            editingFilamentId = null;
+        }
+
+        function saveFilament() {
+            const material = document.getElementById('f-material').value.trim();
+            const color = document.getElementById('f-color').value.trim();
+            const weight = parseFloat(document.getElementById('f-weight').value) || 0;
+            const cost = parseFloat(document.getElementById('f-cost').value) || 0;
+            const brand = document.getElementById('f-brand').value.trim();
+
+            if(!material) return showToast("El material es obligatorio", true);
+
+            if(editingFilamentId) {
+                const f = appState.filaments.find(item => item.id === editingFilamentId);
+                if(f) {
+                    f.material = material;
+                    f.color = color;
+                    f.weight = weight;
+                    f.cost = cost;
+                    f.brand = brand;
+                }
+            } else {
+                appState.filaments.push({
+                    id: 'f' + Date.now(),
+                    material, color, weight, cost, brand
+                });
+            }
+
+            saveToLocalStorage();
+            renderFilaments();
+            renderDashboardKPIs();
+            closeFilamentModal();
+            showToast("Bobina de filamento guardada");
+        }
+
+        function deleteFilament(id) {
+            openConfirmModal("Eliminar Filamento", "¿Remover esta bobina del inventario?", () => {
+                appState.filaments = appState.filaments.filter(f => f.id !== id);
+                saveToLocalStorage();
+                renderFilaments();
+                renderDashboardKPIs();
+                showToast("Filamento eliminado");
+            });
+        }
+
+        function renderFilaments() {
+            const grid = document.getElementById('filaments-grid');
+            if(!grid) return;
+
+            grid.innerHTML = appState.filaments.map(f => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-brand-accent">${f.material} (${f.brand || 'Genérico'})</span>
+                        <div class="flex gap-1">
+                            <button type="button" onclick="openFilamentModal('${f.id}')" class="text-slate-400 hover:text-white"><i data-lucide="edit" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+                            <button type="button" onclick="deleteFilament('${f.id}')" class="text-slate-400 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5 pointer-events-none"></i></button>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-sm text-slate-100">${f.color}</h4>
+                    <div class="flex justify-between items-center text-xs text-slate-400 pt-1 border-t border-slate-800/60">
+                        <span>Restante: <strong class="text-slate-200">${f.weight}g</strong></span>
+                        <span>${appState.businessCurrency || 'AR$'} ${f.cost.toLocaleString()}/kg</span>
+                    </div>
+                </div>
+            `).join('');
+
+            refreshIcons();
+        }
+
+        /* --- DASHBOARD Y GENERAL --- */
+        function renderDashboardKPIs() {
+            const totalIngresos = appState.orders.reduce((sum, o) => sum + (o.total || 0), 0);
+            const kpiIngresos = document.getElementById('kpi-ingresos');
+            if (kpiIngresos) kpiIngresos.innerText = `${appState.businessCurrency || 'AR$'} ${totalIngresos.toLocaleString()}`;
+
+            const kpiPresupuestos = document.getElementById('kpi-presupuestos');
+            if (kpiPresupuestos) kpiPresupuestos.innerText = appState.presupuestos.length;
+
+            const activeMachines = appState.machines.filter(m => m.status === 'Imprimiendo').length;
+            const kpiImpresoras = document.getElementById('kpi-impresoras');
+            if (kpiImpresoras) kpiImpresoras.innerText = `${activeMachines} / ${appState.machines.length}`;
+
+            const totalGrams = appState.filaments.reduce((sum, f) => sum + (f.weight || 0), 0);
+            const kpiFilamento = document.getElementById('kpi-filamento');
+            if (kpiFilamento) kpiFilamento.innerText = `${(totalGrams / 1000).toFixed(1)} kg`;
+
+            // Ventas recientes
+            const recentContainer = document.getElementById('dashboard-recent-orders');
+            if (recentContainer) {
+                const recents = [...appState.orders].slice(-5).reverse();
+                if(recents.length === 0) {
+                    recentContainer.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">Sin ventas aún.</td></tr>`;
+                } else {
+                    recentContainer.innerHTML = recents.map(o => {
+                        const c = appState.clients.find(client => client.id === o.clientId) || { name: 'Cliente' };
+                        return `
+                            <tr>
+                                <td class="py-2.5 px-2 font-bold text-slate-200">${c.name}</td>
+                                <td class="py-2.5 px-2 text-slate-400">${o.id}</td>
+                                <td class="py-2.5 px-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-500/10 text-brand-500">${o.status}</span></td>
+                                <td class="py-2.5 px-2 text-right font-black text-emerald-400">${appState.businessCurrency || 'AR$'} ${o.total.toLocaleString()}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // Impresoras
+            const machinesList = document.getElementById('dashboard-machines-list');
+            if (machinesList) {
+                machinesList.innerHTML = appState.machines.map(m => `
+                    <div class="flex justify-between items-center text-xs p-2 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="font-bold text-slate-200">${m.name}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.status === 'Libre' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}">${m.status}</span>
+                    </div>
+                `).join('');
+            }
+
+            refreshIcons();
+        }
+
+        function renderAll() {
+            renderFolderPills();
+            renderProducts();
+            renderClients();
+            renderPresupuestos();
+            renderOrders();
+            renderProductionSheets();
+            renderMachines();
+            renderFilaments();
+            renderDashboardKPIs();
+        }
+
+        function printPresupuesto(id) {
+            const p = appState.presupuestos.find(item => item.id === id);
+            if (!p) return;
+            const client = appState.clients.find(c => c.id === p.clientId) || { name: 'Cliente', phone: '-' };
+
+            updatePrintableLogoAndWatermark();
+
+            document.getElementById('pr-biz-name').innerText = appState.businessName;
+            document.getElementById('pr-biz-phone').innerText = `Tel: ${appState.businessPhone}`;
+            document.getElementById('pr-biz-address').innerText = appState.businessAddress;
+            document.getElementById('pr-document-type').innerText = "PRESUPUESTO / COTIZACIÓN";
+            document.getElementById('pr-doc-id').innerText = `Nº ${p.id}`;
+            document.getElementById('pr-doc-date').innerText = `Fecha: ${p.date} (Validez: ${p.validityDays} días)`;
+
+            document.getElementById('pr-order-status-val').innerText = p.status;
+            document.getElementById('pr-payment-status-val').innerText = "Pendiente de Confirmación";
+
+            document.getElementById('pr-client-name').innerText = client.name;
+            document.getElementById('pr-client-phone').innerText = `Contacto: ${client.phone}`;
+
+            const list = document.getElementById('pr-items-list');
+            list.innerHTML = '';
+            p.items.forEach(it => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2 font-bold">${it.description}</td>
+                    <td class="py-2 text-center">${it.quantity}</td>
+                    <td class="py-2 text-right">${appState.businessCurrency || 'AR$'} ${it.unitPrice.toLocaleString()}</td>
+                    <td class="py-2 text-right font-bold">${appState.businessCurrency || 'AR$'} ${(it.unitPrice * it.quantity).toLocaleString()}</td>
+                `;
+                list.appendChild(tr);
+            });
+
+            document.getElementById('pr-extra-info').innerText = p.notes ? `Condiciones: ${p.notes}` : '';
+            document.getElementById('pr-total-val').innerText = `${appState.businessCurrency || 'AR$'} ${p.total.toLocaleString()}`;
+            document.getElementById('pr-footer-text').innerText = appState.businessFooter;
+
+            updatePrintableVisibility();
+            document.getElementById('modal-printable').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        function printOrder(id) {
+            const o = appState.orders.find(item => item.id === id);
+            if (!o) return;
+            const client = appState.clients.find(c => c.id === o.clientId) || { name: 'Cliente', phone: '-' };
+
+            updatePrintableLogoAndWatermark();
+
+            document.getElementById('pr-biz-name').innerText = appState.businessName;
+            document.getElementById('pr-biz-phone').innerText = `Tel: ${appState.businessPhone}`;
+            document.getElementById('pr-biz-address').innerText = appState.businessAddress;
+            document.getElementById('pr-document-type').innerText = "COMPROBANTE DE VENTA";
+            document.getElementById('pr-doc-id').innerText = `Nº ${o.id}`;
+            document.getElementById('pr-doc-date').innerText = `Fecha: ${o.date}`;
+
+            document.getElementById('pr-order-status-val').innerText = o.status;
+            document.getElementById('pr-payment-status-val').innerText = o.paymentStatus;
+
+            document.getElementById('pr-client-name').innerText = client.name;
+            document.getElementById('pr-client-phone').innerText = `Contacto: ${client.phone}`;
+
+            const list = document.getElementById('pr-items-list');
+            list.innerHTML = '';
+            o.products.forEach(it => {
+                const prod = appState.products.find(p => p.id === it.productId) || { name: 'Producto' };
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2 font-bold">${prod.name}</td>
+                    <td class="py-2 text-center">${it.quantity}</td>
+                    <td class="py-2 text-right">${appState.businessCurrency || 'AR$'} ${it.price.toLocaleString()}</td>
+                    <td class="py-2 text-right font-bold">${appState.businessCurrency || 'AR$'} ${(it.price * it.quantity).toLocaleString()}</td>
+                `;
+                list.appendChild(tr);
+            });
+
+            document.getElementById('pr-extra-info').innerText = `Método de Pago: ${o.paymentMethod || 'Efectivo'} | Seña: ${appState.businessCurrency || 'AR$'} ${(o.deposit || 0).toLocaleString()}`;
+            document.getElementById('pr-total-val').innerText = `${appState.businessCurrency || 'AR$'} ${o.total.toLocaleString()}`;
+            document.getElementById('pr-footer-text').innerText = appState.businessFooter;
+
+            updatePrintableVisibility();
+            document.getElementById('modal-printable').classList.remove('hidden');
+            refreshIcons();
+        }
+
+        /* --- IMPORTAR Y EXPORTAR --- */
+        function exportData() {
+            try {
+                const dataStr = JSON.stringify(appState, null, 4);
+                const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const anchor = document.createElement('a');
+                anchor.href = url;
+                anchor.download = `prento3d_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(anchor);
+                anchor.click();
+                document.body.removeChild(anchor);
+                URL.revokeObjectURL(url);
+                showToast("Datos exportados con éxito");
+            } catch (err) {
+                console.error("Error exportando datos:", err);
+                showToast("Error al exportar datos", true);
+            }
+        }
+
+        function triggerImportClick() {
+            const input = document.getElementById('import-file');
+            if (input) input.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files ? event.target.files[0] : null;
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && typeof parsed === 'object') {
+                        appState = { ...appState, ...parsed };
+                        saveToLocalStorage();
+                        applyBusinessTheme();
+                        renderAll();
+                        showToast("Copia importada exitosamente");
+                    } else {
+                        showToast("Archivo JSON no válido", true);
+                    }
+                } catch (err) {
+                    console.error("Error importando datos:", err);
+                    showToast("Archivo incompatible", true);
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
+```
